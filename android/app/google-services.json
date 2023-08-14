@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "562011403710",
+    "project_id": "b-cara-70eca",
+    "storage_bucket": "b-cara-70eca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:562011403710:android:eebcf8bfd592c740f5b5ef",
+        "android_client_info": {
+          "package_name": "com.example.b_cara"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "562011403710-6t6gh81i7r8g6fsu2iard1o81lt6cdl3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARXHPaIKAZZCiG5-Zd6sWYU8o92ZtVRS8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "562011403710-6t6gh81i7r8g6fsu2iard1o81lt6cdl3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "562011403710-ne1sj8an9nddtmurm6d16rkhf4anpmn8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.bluechips.bcara.B-cara"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
