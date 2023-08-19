@@ -1,4 +1,6 @@
 import 'package:b_cara/providers/user_provider.dart';
+import 'package:b_cara/resources/auth_methods.dart';
+import 'package:b_cara/resources/chat_methods.dart';
 import 'package:b_cara/responsive/mobile_screen_layout.dart';
 import 'package:b_cara/responsive/responsive_layout.dart';
 import 'package:b_cara/responsive/web_screen_layout.dart';
@@ -26,6 +28,10 @@ void main() async {
     );
   } else {
     await Firebase.initializeApp();
+  }
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  if (firebaseAuth.currentUser != null) {
+    AuthMethods().setUserState(true);
   }
   runApp(const MyApp());
 }

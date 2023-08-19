@@ -1,3 +1,4 @@
+import 'package:b_cara/resources/auth_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:b_cara/utils/colors.dart';
 import 'package:b_cara/utils/global_variable.dart';
@@ -10,7 +11,8 @@ class MobileScreenLayout extends StatefulWidget {
   State<MobileScreenLayout> createState() => _MobileScreenLayoutState();
 }
 
-class _MobileScreenLayoutState extends State<MobileScreenLayout> {
+class _MobileScreenLayoutState extends State<MobileScreenLayout>
+    with WidgetsBindingObserver {
   int _page = 0;
   late PageController pageController;
 
@@ -24,6 +26,22 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   void dispose() {
     super.dispose();
     pageController.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        AuthMethods().setUserState(true);
+        debugPrint("adads");
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.paused:
+        AuthMethods().setUserState(false);
+        break;
+    }
   }
 
   void onPageChanged(int page) {

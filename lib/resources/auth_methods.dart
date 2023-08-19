@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:b_cara/models/user.dart' as model;
 import 'package:b_cara/resources/storage_methods.dart';
+import 'package:flutter/material.dart';
 
 class AuthMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -15,6 +16,7 @@ class AuthMethods {
 
     DocumentSnapshot documentSnapshot =
         await _firestore.collection('users').doc(currentUser.uid).get();
+    debugPrint("${documentSnapshot.data()}");
 
     return model.User.fromSnap(documentSnapshot);
   }
@@ -66,6 +68,7 @@ class AuthMethods {
           bio: bio,
           followers: [],
           following: [],
+          isOnline: true,
         );
 
         await _firestore
@@ -86,6 +89,12 @@ class AuthMethods {
   // Sign Out Method
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  void setUserState(bool isOnline) async {
+    await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+      'is_online': isOnline,
+    });
   }
 
 // Rest of your code (no changes)

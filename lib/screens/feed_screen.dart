@@ -1,7 +1,8 @@
 import 'package:b_cara/screens/add_post_screen.dart';
+import 'package:b_cara/screens/chat_list_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:b_cara/utils/colors.dart';
 import 'package:b_cara/utils/global_variable.dart';
 import 'package:b_cara/widgets/post_card.dart';
@@ -17,7 +18,9 @@ class _FeedScreenState extends State<FeedScreen> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-
+    debugPrint("${FirebaseAuth.instance.currentUser}");
+    // final model.User user = Provider.of<UserProvider>(context).getUser;
+    // debugPrint("Test ${user.uid}");
     return Scaffold(
       backgroundColor:
           width > webScreenSize ? webBackgroundColor : mobileBackgroundColor,
@@ -26,18 +29,24 @@ class _FeedScreenState extends State<FeedScreen> {
           : AppBar(
               backgroundColor: mobileBackgroundColor,
               centerTitle: false,
-              title: SvgPicture.asset(
-                'assets/ic_instagram.svg',
-                color: primaryColor,
-                height: 32,
-              ),
+              // title: SvgPicture.asset(
+              //   'assets/ic_instagram.svg',
+              //   color: primaryColor,
+              //   height: 32,
+              // ),
               actions: [
                 IconButton(
                   icon: const Icon(
                     Icons.messenger_outline,
                     color: primaryColor,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return const ChatListScreen();
+                      },
+                    ));
+                  },
                 ),
               ],
             ),

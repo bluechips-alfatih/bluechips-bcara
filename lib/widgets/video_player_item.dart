@@ -22,6 +22,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
     videoPlayerController = VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((value) {
         videoPlayerController.play();
+        videoPlayerController.setLooping(true);
         videoPlayerController.setVolume(1);
       });
   }

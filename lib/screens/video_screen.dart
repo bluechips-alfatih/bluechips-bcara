@@ -13,8 +13,8 @@ class VideoScreen extends StatelessWidget {
     return Scaffold(
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
-            .collection('posts')
-            .where('type', isEqualTo: 'video')
+            .collection('videos')
+            // .where('type', isEqualTo: 'video')
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -22,7 +22,6 @@ class VideoScreen extends StatelessWidget {
               child: CircularProgressIndicator(),
             );
           }
-          debugPrint("Length : ${snapshot.data!.docs.length}");
           return PageView.builder(
             itemCount: snapshot.data!.docs.length,
             controller: PageController(initialPage: 0, viewportFraction: 1),

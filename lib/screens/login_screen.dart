@@ -84,11 +84,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   flex: 2,
                   child: Container(),
                 ),
-                SvgPicture.asset(
-                  'assets/ic_instagram.svg',
-                  color: primaryColor,
-                  height: 64,
-                ),
+                // SvgPicture.asset(
+                //   'assets/ic_instagram.svg',
+                //   color: primaryColor,
+                //   height: 64,
+                // ),
                 const SizedBox(
                   height: 64,
                 ),
@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value!.isEmpty) {
                       return "Email is required";
                     }
-                    return "";
+                    return null;
                   },
                 ),
                 const SizedBox(
@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value!.isEmpty) {
                       return "Password is required";
                     }
-                    return "";
+                    return null;
                   },
                 ),
                 const SizedBox(

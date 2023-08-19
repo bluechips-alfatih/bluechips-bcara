@@ -14,8 +14,12 @@ class FireStoreMethods {
     // asking uid here because we dont want to make extra calls to firebase auth when we can just get from our state management
     String res = "Some error occurred";
     try {
+      String childName = "posts";
+      if (type == "video") {
+        childName = "videos";
+      }
       String photoUrl =
-          await StorageMethods().uploadImageToStorage('posts', file, true);
+          await StorageMethods().uploadImageToStorage(childName, file, true);
       String postId = const Uuid().v1(); // creates unique id based on time
       Post post = Post(
         description: description,
@@ -28,7 +32,7 @@ class FireStoreMethods {
         profImage: profImage,
         type: type,
       );
-      _firestore.collection('posts').doc(postId).set(post.toJson());
+      _firestore.collection(childName).doc(postId).set(post.toJson());
       res = "success";
     } catch (err) {
       res = err.toString();
@@ -36,17 +40,26 @@ class FireStoreMethods {
     return res;
   }
 
-  Future<String> likePost(String postId, String uid, List likes) async {
+  Future<String> likePost(String postId, String uid, List likes,
+      {bool isPost = true}) async {
     String res = "Some error occurred";
     try {
       if (likes.contains(uid)) {
         // if the likes list contains the user uid, we need to remove it
-        _firestore.collection('posts').doc(postId).update({
+        String collection = "posts";
+        if (!isPost) {
+          collection = "videos";
+        }
+        _firestore.collection(collection).doc(postId).update({
           'likes': FieldValue.arrayRemove([uid])
         });
       } else {
         // else we need to add uid to the likes array
-        _firestore.collection('posts').doc(postId).update({
+        String collection = "posts";
+        if (!isPost) {
+          collection = "videos";
+        }
+        _firestore.collection(collection).doc(postId).update({
           'likes': FieldValue.arrayUnion([uid])
         });
       }

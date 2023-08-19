@@ -21,6 +21,7 @@ class AddPostScreen extends StatefulWidget {
 class _AddPostScreenState extends State<AddPostScreen> {
   // Uint8List? _file;
   File? _file;
+  File? _thumbNail;
   bool isLoading = false;
   final TextEditingController _descriptionController = TextEditingController();
 
@@ -30,6 +31,11 @@ class _AddPostScreenState extends State<AddPostScreen> {
       quality: VideoQuality.MediumQuality,
     );
     return compressedVideo!.file;
+  }
+
+  Future<File> _getThumbnail(String videoPath) async {
+    final thumbnail = await VideoCompress.getFileThumbnail(videoPath);
+    return thumbnail;
   }
 
   _selectImage(BuildContext parentContext) async {
@@ -87,6 +93,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     file = await pickVideo(
                       ImageSource.gallery,
                     );
+                    _thumbNail = await _getThumbnail(file!.path);
                   }
 
                   if (file != null) {
@@ -222,9 +229,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        userProvider.getUser.photoUrl,
-                      ),
+                      backgroundColor: Colors.white,
+                      backgroundImage: userProvider.getUser.photoUrl.isEmpty
+                          ? const AssetImage("assets/images/ic_user.png")
+                          : NetworkImage(
+                              userProvider.getUser.photoUrl,
+                            ) as ImageProvider,
                     ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.3,
@@ -246,7 +256,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                               image: DecorationImage(
                             fit: BoxFit.fill,
                             alignment: FractionalOffset.topCenter,
-                            image: FileImage(_file!),
+                            image: widget.uploadType == "image"
+                                ? FileImage(_file!)
+                                : FileImage(_thumbNail!),
                           )),
                         ),
                       ),

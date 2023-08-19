@@ -90,9 +90,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           CircleAvatar(
                             backgroundColor: Colors.grey,
-                            backgroundImage: NetworkImage(
-                              userData['photoUrl'],
-                            ),
+                            backgroundImage: userData['photoUrl'].isEmpty ||
+                                    userData['photoUrl'] == null
+                                ? const AssetImage("assets/images/ic_user.png")
+                                : NetworkImage(
+                                    userData['photoUrl'],
+                                  ) as ImageProvider,
                             radius: 40,
                           ),
                           Expanded(

@@ -1,3 +1,4 @@
+import 'package:b_cara/screens/conversations_screen.dart';
 import 'package:b_cara/widgets/video_player_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class _PostCardState extends State<PostCard> {
   void initState() {
     super.initState();
     fetchCommentLen();
+    addData();
   }
 
   fetchCommentLen() async {
@@ -63,6 +65,12 @@ class _PostCardState extends State<PostCard> {
     }
   }
 
+  addData() async {
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await userProvider.refreshUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     final model.User user = Provider.of<UserProvider>(context).getUser;
@@ -91,9 +99,11 @@ class _PostCardState extends State<PostCard> {
               children: <Widget>[
                 CircleAvatar(
                   radius: 16,
-                  backgroundImage: NetworkImage(
-                    widget.snap['profImage'].toString(),
-                  ),
+                  backgroundColor: Colors.white,
+                  backgroundImage: widget.snap['profImage'].isEmpty
+                      ? const AssetImage("assets/images/ic_user.png")
+                      : NetworkImage(widget.snap['profImage'].toString())
+                          as ImageProvider,
                 ),
                 Expanded(
                   child: Padding(
@@ -155,6 +165,19 @@ class _PostCardState extends State<PostCard> {
                         icon: const Icon(Icons.more_vert),
                       )
                     : Container(),
+                widget.snap['uid'].toString() != user.uid &&
+                        !user.following.contains(widget.snap['uid'])
+                    ? Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        child: TextButton(
+                          onPressed: () {
+                            FireStoreMethods()
+                                .followUser(user.uid, widget.snap['uid']);
+                          },
+                          child: const Text("FOLLOW"),
+                        ),
+                      )
+                    : const SizedBox(),
               ],
             ),
           ),
@@ -244,11 +267,24 @@ class _PostCardState extends State<PostCard> {
                   ),
                 ),
               ),
-              IconButton(
-                  icon: const Icon(
-                    Icons.send,
-                  ),
-                  onPressed: () {}),
+              user.following.contains(widget.snap['uid']) ||
+                      user.uid != widget.snap['uid']
+                  ? IconButton(
+                      icon: const Icon(
+                        Icons.send,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) {
+                            return ConversationsScreen(
+                                name: widget.snap['username'],
+                                uid: widget.snap['uid'],
+                                isGroupChat: false,
+                                profilePic: widget.snap['photoUrl'] ?? "");
+                          },
+                        ));
+                      })
+                  : const SizedBox(),
               Expanded(
                   child: Align(
                 alignment: Alignment.bottomRight,

@@ -20,8 +20,8 @@ class ResponsiveLayout extends StatefulWidget {
 class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   @override
   void initState() {
-    super.initState();
     addData();
+    super.initState();
   }
 
   addData() async {

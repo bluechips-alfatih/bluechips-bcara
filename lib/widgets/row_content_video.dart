@@ -61,7 +61,11 @@ class _RowContentVideoState extends State<RowContentVideo> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
               child: Image(
-                image: NetworkImage(profilePhoto),
+                image: profilePhoto.isEmpty
+                    ? const AssetImage("assets/images/ic_user.png")
+                    : NetworkImage(
+                        profilePhoto,
+                      ) as ImageProvider,
                 fit: BoxFit.cover,
               ),
             ),
@@ -147,11 +151,17 @@ class _RowContentVideoState extends State<RowContentVideo> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   InkWell(
-                    onTap: () => FireStoreMethods().likePost(
-                      widget.snap['postId'].toString(),
-                      user.uid,
-                      widget.snap['likes'],
-                    ),
+                    onTap: () {
+                      FireStoreMethods().likePost(
+                        widget.snap['postId'].toString(),
+                        user.uid,
+                        widget.snap['likes'],
+                        isPost: false,
+                      );
+                      setState(() {
+                        isLikeAnimating = true;
+                      });
+                    },
                     child: widget.snap['likes'].contains(user.uid)
                         ? const Icon(
                             Icons.favorite,
