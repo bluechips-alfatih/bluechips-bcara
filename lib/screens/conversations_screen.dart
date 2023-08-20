@@ -2,6 +2,7 @@ import 'package:b_cara/models/call.dart';
 import 'package:b_cara/models/user.dart' as model;
 import 'package:b_cara/providers/user_provider.dart';
 import 'package:b_cara/resources/call_method.dart';
+import 'package:b_cara/screens/call/voice_call_screen.dart';
 import 'package:b_cara/utils/utils.dart';
 import 'package:b_cara/widgets/chats/bottom_chat_field.dart';
 import 'package:b_cara/widgets/chats/chat_list.dart';
@@ -36,9 +37,7 @@ class ConversationsScreen extends StatelessWidget {
         );
   }
 
-  void makeCall(
-    BuildContext context,
-  ) async {
+  void makeCall(BuildContext context, {bool isVideoCall = false}) async {
     try {
       final UserProvider userProvider =
           Provider.of<UserProvider>(context, listen: false);
@@ -52,6 +51,7 @@ class ConversationsScreen extends StatelessWidget {
         receiverPic: profilePic,
         callId: callId,
         hasDialled: true,
+        isVideoCall: isVideoCall,
       );
 
       Call recieverCallData = Call(
@@ -63,11 +63,13 @@ class ConversationsScreen extends StatelessWidget {
         receiverPic: profilePic,
         callId: callId,
         hasDialled: false,
+        isVideoCall: isVideoCall,
       );
       if (isGroupChat) {
         // CallMethod().makeGroupCall(senderCallData, context, recieverCallData);
       } else {
-        CallMethod().makeCall(senderCallData, context, recieverCallData);
+        CallMethod().makeCall(senderCallData, context, recieverCallData,
+            isVideoCall: isVideoCall);
       }
     } catch (e) {
       showSnackBar(context, e.toString());
@@ -103,26 +105,30 @@ class ConversationsScreen extends StatelessWidget {
                   );
                 }),
         centerTitle: false,
-        actions: !isGroupChat
-            ? [
-                IconButton(
+        actions: [
+          !isGroupChat
+              ? IconButton(
                   onPressed: () {
-                    makeCall(context);
+                    makeCall(context, isVideoCall: true);
                   },
                   icon: const Icon(Icons.video_call),
-                ),
-                IconButton(
+                )
+              : const SizedBox(),
+          !isGroupChat
+              ? IconButton(
                   onPressed: () {
-                    makeCall(context);
+                    makeCall(context, isVideoCall: false);
                   },
                   icon: const Icon(Icons.call),
-                ),
-                IconButton(
+                )
+              : const SizedBox(),
+          !isGroupChat
+              ? IconButton(
                   onPressed: () {},
                   icon: const Icon(Icons.more_vert),
-                ),
-              ]
-            : [],
+                )
+              : const SizedBox(),
+        ],
       ),
       body: Column(
         children: [

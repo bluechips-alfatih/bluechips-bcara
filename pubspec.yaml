@@ -43,6 +43,7 @@ dependencies:
   intl: ^0.18.1
   get: ^4.6.5
   video_thumbnail: ^0.5.3
+  agora_rtc_engine: ^6.2.2
 
 dev_dependencies:
   flutter_test:

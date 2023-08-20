@@ -1,5 +1,6 @@
 import 'package:b_cara/models/call.dart';
 import 'package:b_cara/screens/call/call_screen.dart';
+import 'package:b_cara/screens/call/voice_call_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -69,16 +70,29 @@ class CallPickupScreen extends StatelessWidget {
                         const SizedBox(width: 25),
                         IconButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CallScreen(
-                                  channelId: call.callId,
-                                  call: call,
-                                  isGroupChat: false,
+                            if (call.isVideoCall) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CallScreen(
+                                    channelId: call.callId,
+                                    call: call,
+                                    isGroupChat: false,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => VoiceCallScreen(
+                                    channelId: call.callId,
+                                    call: call,
+                                    isGroupChat: false,
+                                  ),
+                                ),
+                              );
+                            }
                           },
                           icon: const Icon(
                             Icons.call,
