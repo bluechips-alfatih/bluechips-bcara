@@ -1,6 +1,7 @@
 import 'package:b_cara/models/call.dart';
 import 'package:b_cara/screens/call/call_screen.dart';
 import 'package:b_cara/screens/call/voice_call_screen.dart';
+import 'package:b_cara/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,25 @@ class CallPickupScreen extends StatelessWidget {
       .collection('call')
       .doc(auth.currentUser!.uid)
       .snapshots();
+
+  void endCall(
+    String callerId,
+    String receiverId,
+    BuildContext context,
+  ) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('call')
+          .doc(callerId)
+          .delete();
+      await FirebaseFirestore.instance
+          .collection('call')
+          .doc(receiverId)
+          .delete();
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +83,9 @@ class CallPickupScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            endCall(call.callerId, call.receiverId, context);
+                          },
                           icon: const Icon(Icons.call_end,
                               color: Colors.redAccent),
                         ),

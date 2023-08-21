@@ -3,6 +3,7 @@ import 'package:b_cara/config/agora_config.dart';
 import 'package:b_cara/models/call.dart';
 import 'package:b_cara/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CallScreen extends StatefulWidget {
@@ -23,21 +24,37 @@ class CallScreen extends StatefulWidget {
 
 class _CallScreenState extends State<CallScreen> {
   AgoraClient? client;
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
     client = AgoraClient(
-      agoraConnectionData: AgoraConnectionData(
-        appId: AgoraConfig.appId,
-        channelName: widget.channelId,
-      ),
-    );
+        agoraConnectionData: AgoraConnectionData(
+          appId: AgoraConfig.appId,
+          channelName: widget.channelId,
+        ),
+        agoraEventHandlers: AgoraRtcEventHandlers(
+          onUserOffline: (connection, remoteUid, reason) {
+            debugPrint("Alasan : ${reason.name}");
+            if (mounted) {
+              client!.engine.leaveChannel();
+              Navigator.of(context).pop();
+            }
+          },
+        ));
     initAgora();
   }
 
   void initAgora() async {
     await client!.initialize();
+  }
+
+  @override
+  void dispose() {
+    client!.engine.release();
+    client!.release();
+    super.dispose();
   }
 
   void endCall(
@@ -59,39 +76,56 @@ class _CallScreenState extends State<CallScreen> {
     }
   }
 
+  Future<DocumentSnapshot<Map<String, dynamic>>> get callStream =>
+      FirebaseFirestore.instance
+          .collection('call')
+          .doc(auth.currentUser!.uid)
+          .get();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.call.receiverName),
+        leading: const SizedBox(),
       ),
       body: client == null
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : SafeArea(
-              child: Stack(
-                children: [
-                  AgoraVideoViewer(client: client!),
-                  AgoraVideoButtons(
-                    client: client!,
-                    disconnectButtonChild: IconButton(
-                      onPressed: () async {
-                        await client!.engine.leaveChannel();
-                        if (mounted) {
-                          endCall(
-                            widget.call.callerId,
-                            widget.call.receiverId,
-                            context,
-                          );
-                          Navigator.pop(context);
-                        }
-                      },
-                      icon: const Icon(Icons.call_end),
-                    ),
+          : FutureBuilder(
+              future: callStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return SafeArea(
+                  child: Stack(
+                    children: [
+                      AgoraVideoViewer(client: client!),
+                      AgoraVideoButtons(
+                        client: client!,
+                        disconnectButtonChild: IconButton(
+                          onPressed: () async {
+                            await client!.engine.leaveChannel();
+                            if (mounted) {
+                              endCall(
+                                widget.call.callerId,
+                                widget.call.receiverId,
+                                context,
+                              );
+                              Navigator.pop(context);
+                            }
+                          },
+                          icon: const Icon(Icons.call_end),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
     );
   }

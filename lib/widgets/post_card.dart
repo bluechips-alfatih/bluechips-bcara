@@ -1,4 +1,5 @@
 import 'package:b_cara/screens/conversations_screen.dart';
+import 'package:b_cara/screens/profile_screen.dart';
 import 'package:b_cara/widgets/video_player_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,6 @@ import 'package:b_cara/utils/utils.dart';
 import 'package:b_cara/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
 
 class PostCard extends StatefulWidget {
   final snap;
@@ -90,95 +90,109 @@ class _PostCardState extends State<PostCard> {
       child: Column(
         children: [
           // HEADER SECTION OF THE POST
-          Container(
-            padding: const EdgeInsets.symmetric(
-              vertical: 4,
-              horizontal: 16,
-            ).copyWith(right: 0),
-            child: Row(
-              children: <Widget>[
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.white,
-                  backgroundImage: widget.snap['profImage'].isEmpty
-                      ? const AssetImage("assets/images/ic_user.png")
-                      : NetworkImage(widget.snap['profImage'].toString())
-                          as ImageProvider,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 8,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          widget.snap['username'].toString(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(
+                    uid: widget.snap['uid'],
                   ),
                 ),
-                widget.snap['uid'].toString() == user.uid
-                    ? IconButton(
-                        onPressed: () {
-                          showDialog(
-                            useRootNavigator: false,
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                child: ListView(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                    shrinkWrap: true,
-                                    children: [
-                                      'Delete',
-                                    ]
-                                        .map(
-                                          (e) => InkWell(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 12,
-                                                        horizontal: 16),
-                                                child: Text(e),
-                                              ),
-                                              onTap: () {
-                                                deletePost(
-                                                  widget.snap['postId']
-                                                      .toString(),
-                                                );
-                                                // remove the dialog box
-                                                Navigator.of(context).pop();
-                                              }),
-                                        )
-                                        .toList()),
-                              );
-                            },
-                          );
-                        },
-                        icon: const Icon(Icons.more_vert),
-                      )
-                    : Container(),
-                widget.snap['uid'].toString() != user.uid &&
-                        !user.following.contains(widget.snap['uid'])
-                    ? Container(
-                        margin: const EdgeInsets.only(right: 12),
-                        child: TextButton(
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                vertical: 4,
+                horizontal: 16,
+              ).copyWith(right: 0),
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Colors.white,
+                    backgroundImage: widget.snap['profImage'].isEmpty
+                        ? const AssetImage("assets/images/ic_user.png")
+                        : NetworkImage(widget.snap['profImage'].toString())
+                            as ImageProvider,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 8,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            widget.snap['username'].toString(),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  widget.snap['uid'].toString() == user.uid
+                      ? IconButton(
                           onPressed: () {
-                            FireStoreMethods()
-                                .followUser(user.uid, widget.snap['uid']);
+                            showDialog(
+                              useRootNavigator: false,
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  child: ListView(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      shrinkWrap: true,
+                                      children: [
+                                        'Delete',
+                                      ]
+                                          .map(
+                                            (e) => InkWell(
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      vertical: 12,
+                                                      horizontal: 16),
+                                                  child: Text(e),
+                                                ),
+                                                onTap: () {
+                                                  deletePost(
+                                                    widget.snap['postId']
+                                                        .toString(),
+                                                  );
+                                                  // remove the dialog box
+                                                  Navigator.of(context).pop();
+                                                }),
+                                          )
+                                          .toList()),
+                                );
+                              },
+                            );
                           },
-                          child: const Text("FOLLOW"),
-                        ),
-                      )
-                    : const SizedBox(),
-              ],
+                          icon: const Icon(Icons.more_vert),
+                        )
+                      : Container(),
+                  widget.snap['uid'].toString() != user.uid &&
+                          !user.following.contains(widget.snap['uid'])
+                      ? Container(
+                          margin: const EdgeInsets.only(right: 12),
+                          child: TextButton(
+                            onPressed: () {
+                              FireStoreMethods()
+                                  .followUser(user.uid, widget.snap['uid'])
+                                  .then((value) {
+                                setState(() => user.following.add(user.uid));
+                              });
+                            },
+                            child: const Text("FOLLOW"),
+                          ),
+                        )
+                      : const SizedBox(),
+                ],
+              ),
             ),
           ),
           // IMAGE SECTION OF THE POST

@@ -2,6 +2,7 @@ import 'package:b_cara/models/user.dart';
 import 'package:b_cara/providers/user_provider.dart';
 import 'package:b_cara/resources/firestore_methods.dart';
 import 'package:b_cara/screens/comments_screen.dart';
+import 'package:b_cara/screens/profile_screen.dart';
 import 'package:b_cara/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -50,23 +51,34 @@ class _RowContentVideoState extends State<RowContentVideo> {
       child: Stack(children: [
         Positioned(
           left: 5,
-          child: Container(
-            width: 50,
-            height: 50,
-            padding: const EdgeInsets.all(1),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Image(
-                image: profilePhoto.isEmpty
-                    ? const AssetImage("assets/images/ic_user.png")
-                    : NetworkImage(
-                        profilePhoto,
-                      ) as ImageProvider,
-                fit: BoxFit.cover,
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(
+                    uid: widget.snap['uid'],
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              width: 50,
+              height: 50,
+              padding: const EdgeInsets.all(1),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: Image(
+                  image: profilePhoto.isEmpty
+                      ? const AssetImage("assets/images/ic_user.png")
+                      : NetworkImage(
+                          profilePhoto,
+                        ) as ImageProvider,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
@@ -93,12 +105,23 @@ class _RowContentVideoState extends State<RowContentVideo> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(
-                  widget.snap['username'],
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ProfileScreen(
+                          uid: widget.snap['uid'],
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    widget.snap['username'],
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(

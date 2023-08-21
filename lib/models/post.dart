@@ -32,7 +32,10 @@ class Post {
         uid: snapshot["uid"],
         likes: snapshot["likes"],
         postId: snapshot["postId"],
-        datePublished: snapshot["datePublished"],
+        datePublished: snapshot["datePublished"] is Timestamp
+            ? DateTime.fromMicrosecondsSinceEpoch(
+                snapshot["datePublished"].nanoseconds)
+            : snapshot["datePublished"],
         username: snapshot["username"],
         postUrl: snapshot['postUrl'],
         profImage: snapshot['profImage']);

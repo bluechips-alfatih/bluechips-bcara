@@ -16,7 +16,7 @@ class UserTile extends StatelessWidget {
     return ListTile(
       title: Text(snap.username.toString()),
       trailing: TextButton(
-        onPressed: () {
+        onPressed: () async {
           if (userProvider.getUser.following.contains(snap.uid)) {
             Navigator.of(context).push(MaterialPageRoute(
               builder: (context) {
@@ -28,7 +28,9 @@ class UserTile extends StatelessWidget {
               },
             ));
           } else {
-            FireStoreMethods().followUser(userProvider.getUser.uid, snap.uid);
+            await FireStoreMethods()
+                .followUser(userProvider.getUser.uid, snap.uid);
+            userProvider.getUser.following.add(snap.uid);
           }
         },
         child: userProvider.getUser.following.contains(snap.uid) ||

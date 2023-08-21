@@ -166,6 +166,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     setState(() {
       _file = null;
     });
+    Navigator.of(context).pop();
   }
 
   @override
@@ -180,6 +181,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
     return _file == null
         ? Scaffold(
+            appBar: AppBar(
+              backgroundColor: mobileBackgroundColor,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: clearImage,
+              ),
+            ),
             body: Center(
               child: IconButton(
                 icon: const Icon(
