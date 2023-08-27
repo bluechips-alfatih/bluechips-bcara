@@ -3,6 +3,7 @@ import 'package:b_cara/models/user.dart' as model;
 import 'package:b_cara/providers/user_provider.dart';
 import 'package:b_cara/resources/call_method.dart';
 import 'package:b_cara/screens/call/voice_call_screen.dart';
+import 'package:b_cara/utils/global_variable.dart';
 import 'package:b_cara/utils/utils.dart';
 import 'package:b_cara/widgets/chats/bottom_chat_field.dart';
 import 'package:b_cara/widgets/chats/chat_list.dart';
@@ -136,9 +137,11 @@ class ConversationsScreen extends StatelessWidget {
             child: ChatList(
               recieverUserId: uid,
               isGroupChat: isGroupChat,
+              fromScreen: FromScreen.usersChatScreen,
             ),
           ),
           BottomChatField(
+            fromScreen: FromScreen.usersChatScreen,
             recieverUserId: uid,
             isGroupChat: isGroupChat,
           ),

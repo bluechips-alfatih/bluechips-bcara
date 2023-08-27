@@ -1,3 +1,4 @@
+import 'package:b_cara/screens/ai_chat_screen.dart';
 import 'package:b_cara/screens/call/call_pickup_screen.dart';
 import 'package:b_cara/screens/contact_list_screen.dart';
 import 'package:b_cara/screens/group/create_group_screen.dart';
@@ -41,6 +42,19 @@ class _ChatListScreenState extends State<ChatListScreen>
               ),
             ),
             actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const AIChatScreen(),
+                  ));
+                },
+                icon: const Icon(
+                  Icons.comment,
+                  color: Colors.white,
+                ),
+                color: Colors.white,
+                tooltip: "Chat AI GPT",
+              ),
               PopupMenuButton(
                 icon: const Icon(
                   Icons.more_vert,

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:b_cara/providers/user_provider.dart';
 import 'package:b_cara/resources/chat_methods.dart';
+import 'package:b_cara/utils/global_variable.dart';
 import 'package:b_cara/utils/message_enum.dart';
 import 'package:b_cara/utils/message_reply.dart';
 import 'package:b_cara/utils/utils.dart';
@@ -15,11 +16,13 @@ import 'package:provider/provider.dart';
 class BottomChatField extends StatefulWidget {
   final String recieverUserId;
   final bool isGroupChat;
+  final FromScreen fromScreen;
 
   const BottomChatField({
     Key? key,
     required this.recieverUserId,
     required this.isGroupChat,
+    required this.fromScreen,
   }) : super(key: key);
 
   @override
@@ -55,12 +58,25 @@ class _BottomChatFieldState extends State<BottomChatField> {
     final UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
     if (isShowSendButton) {
-      ChatMethods().sendTextMessage(
-          context: context,
-          text: _messageController.text.trim(),
-          recieverUserId: widget.recieverUserId,
-          senderUser: userProvider.getUser,
-          isGroupChat: widget.isGroupChat);
+      if (widget.fromScreen == FromScreen.aIChatScreen) {
+        ChatMethods().saveChatGptToCollection(
+            message: _messageController.text.trim(),
+            uid: userProvider.getUser.uid,
+            isText: true,
+            modelId: "gpt-3.5-turbo");
+        ChatMethods().sendMessageToChatGPT(
+            message: _messageController.text.trim(),
+            uid: userProvider.getUser.uid,
+            isText: true,
+            modelId: "gpt-3.5-turbo");
+      } else {
+        ChatMethods().sendTextMessage(
+            context: context,
+            text: _messageController.text.trim(),
+            recieverUserId: widget.recieverUserId,
+            senderUser: userProvider.getUser,
+            isGroupChat: widget.isGroupChat);
+      }
 
       setState(() {
         _messageController.text = '';
@@ -192,53 +208,59 @@ class _BottomChatFieldState extends State<BottomChatField> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.black,
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: SizedBox(
-                      width: 50,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: toggleEmojiKeyboardContainer,
-                            icon: const Icon(
-                              Icons.emoji_emotions,
-                              color: Colors.grey,
+                  prefixIcon: widget.fromScreen != FromScreen.aIChatScreen
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: SizedBox(
+                            width: 50,
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  onPressed: toggleEmojiKeyboardContainer,
+                                  icon: const Icon(
+                                    Icons.emoji_emotions,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                // IconButton(
+                                //   onPressed: selectGIF,
+                                //   icon: const Icon(
+                                //     Icons.gif,
+                                //     color: Colors.grey,
+                                //   ),
+                                // ),
+                              ],
                             ),
                           ),
-                          // IconButton(
-                          //   onPressed: selectGIF,
-                          //   icon: const Icon(
-                          //     Icons.gif,
-                          //     color: Colors.grey,
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  suffixIcon: SizedBox(
-                    width: 100,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          onPressed: selectImage,
-                          icon: const Icon(
-                            Icons.camera_alt,
-                            color: Colors.grey,
+                        )
+                      : null,
+                  suffixIcon: widget.fromScreen != FromScreen.aIChatScreen
+                      ? SizedBox(
+                          width: 100,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                onPressed: selectImage,
+                                icon: const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: selectVideo,
+                                icon: const Icon(
+                                  Icons.attach_file,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        IconButton(
-                          onPressed: selectVideo,
-                          icon: const Icon(
-                            Icons.attach_file,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  hintText: 'Type a message!',
+                        )
+                      : null,
+                  hintText: widget.fromScreen == FromScreen.aIChatScreen
+                      ? 'How can i help you?'
+                      : 'Type a message!',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.0),
                     borderSide: const BorderSide(

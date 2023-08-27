@@ -1,11 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:b_cara/models/chat_gpt.dart';
+import 'package:b_cara/services/api_service.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:b_cara/models/chat_contact.dart';
 import 'package:b_cara/models/group.dart';
 import 'package:b_cara/models/message.dart';
 import 'package:b_cara/resources/storage_methods.dart';
+import 'package:b_cara/utils/global_variable.dart';
 import 'package:b_cara/utils/message_enum.dart';
-import 'package:b_cara/utils/message_reply.dart';
 import 'package:b_cara/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -338,5 +342,91 @@ class ChatMethods {
     } catch (e) {
       showSnackBar(context, e.toString());
     }
+  }
+
+  Future<void> sendMessageToChatGPT({
+    required String uid,
+    required String message,
+    required bool isText,
+    required String modelId,
+  }) async {
+    String chatId = const Uuid().v4();
+    var timeSent = DateTime.now();
+    String answer = await ApiService.sendMessageToChatGPT(
+        message: message, modelId: modelId, isText: isText);
+
+    if (isText) {
+      ChatGPT chatGPT = ChatGPT(
+          message: answer,
+          senderId: 'assistant',
+          chatId: chatId,
+          timeSent: timeSent.millisecondsSinceEpoch,
+          isText: isText);
+      await _firestore
+          .collection('users')
+          .doc(_auth.currentUser!.uid)
+          .collection('chatsGPT')
+          .doc(uid)
+          .collection('messages')
+          .doc(chatId)
+          .set(
+            chatGPT.toJSON(),
+          );
+      // await _firestore
+      //     .collection("chats")
+      //     .doc(uid)
+      //     .collection(Constants.chatGPTChats)
+      //     .doc(chatId)
+      //     .set({
+      // Constants.senderId: 'assistant',
+      // Constants.chatId: chatId,
+      // Constants.message: answer,
+      // Constants.messageTime: FieldValue.serverTimestamp(),
+      // Constants.isText: isText,
+      // });
+    }
+    // else {
+    //   String imageUrl = await saveImageFileToFireStore(url: answer);
+    //
+    //   await firebaseFirestore
+    //       .collection(Constants.chats)
+    //       .doc(uid)
+    //       .collection(Constants.chatGPTChats)
+    //       .doc(chatId)
+    //       .set({
+    //     Constants.senderId: 'assistant',
+    //     Constants.chatId: chatId,
+    //     Constants.message: imageUrl,
+    //     Constants.messageTime: FieldValue.serverTimestamp(),
+    //     Constants.isText: isText,
+    //   });
+    // }
+  }
+
+  Future<void> saveChatGptToCollection(
+      {required String uid,
+      required String message,
+      required bool isText,
+      required String modelId}) async {
+    String chatId = const Uuid().v4();
+    var timeSent = DateTime.now();
+
+    final ChatGPT chatGPT = ChatGPT(
+        message: message,
+        senderId: uid,
+        chatId: chatId,
+        timeSent: timeSent.millisecondsSinceEpoch,
+        isText: isText);
+
+    await _firestore
+        .collection('users')
+        .doc(_auth.currentUser!.uid)
+        .collection('chatsGPT')
+        .doc(uid)
+        .collection('messages')
+        .doc(chatId)
+        .set(
+          chatGPT.toJSON(),
+        );
   }
 }

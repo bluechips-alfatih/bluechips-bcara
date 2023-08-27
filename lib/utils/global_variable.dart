@@ -17,3 +17,13 @@ List<Widget> homeScreenItems = [
     uid: FirebaseAuth.instance.currentUser!.uid,
   ),
 ];
+
+const String baseUrl = 'https://api.openai.com/v1';
+const String chatGPTApiKey =
+    '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';
+
+enum FromScreen {
+  commentsScreen,
+  aIChatScreen,
+  usersChatScreen,
+}

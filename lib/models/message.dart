@@ -36,9 +36,25 @@ class Message {
       senderId: map['senderId'] ?? '',
       recieverid: map['recieverid'] ?? '',
       text: map['text'] ?? '',
-      type: (map['type'] as String).toEnum(),
+      type: map.containsKey("type")
+          ? (map['type'] as String).toEnum()
+          : MessageEnum.text,
       timeSent: DateTime.fromMillisecondsSinceEpoch(map['timeSent']),
       messageId: map['messageId'] ?? '',
+      isSeen: map['isSeen'] ?? false,
+    );
+  }
+
+  factory Message.fromMapGpt(Map<String, dynamic> map) {
+    return Message(
+      senderId: map['senderId'] ?? '',
+      recieverid: map['recieverid'] ?? '',
+      text: map['message'] ?? '',
+      type: map.containsKey("type")
+          ? (map['type'] as String).toEnum()
+          : MessageEnum.text,
+      timeSent: DateTime.fromMillisecondsSinceEpoch(map['timeSent']),
+      messageId: map['chatId'] ?? '',
       isSeen: map['isSeen'] ?? false,
     );
   }

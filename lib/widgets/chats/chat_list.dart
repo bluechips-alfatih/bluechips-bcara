@@ -1,5 +1,6 @@
 import 'package:b_cara/providers/user_provider.dart';
 import 'package:b_cara/resources/chat_methods.dart';
+import 'package:b_cara/utils/global_variable.dart';
 import 'package:b_cara/widgets/chats/my_message_card.dart';
 import 'package:b_cara/widgets/chats/sender_message_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,11 +15,13 @@ import '../../models/message.dart';
 class ChatList extends StatefulWidget {
   final String recieverUserId;
   final bool isGroupChat;
+  final FromScreen fromScreen;
 
   const ChatList({
     Key? key,
     required this.recieverUserId,
     required this.isGroupChat,
+    required this.fromScreen,
   }) : super(key: key);
 
   @override
@@ -37,18 +40,29 @@ class _ChatListState extends State<ChatList> {
   Stream<List<Message>> _getChatStream(
       String recieverUserId, BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
+    String collection = "chats";
+    String uid = recieverUserId;
+    if (widget.fromScreen == FromScreen.aIChatScreen) {
+      collection = "chatsGPT";
+      uid = userProvider.getUser.uid;
+    }
     return FirebaseFirestore.instance
         .collection('users')
         .doc(userProvider.getUser.uid)
-        .collection('chats')
-        .doc(recieverUserId)
+        .collection(collection)
+        .doc(uid)
         .collection('messages')
         .orderBy('timeSent')
         .snapshots()
         .map((event) {
       List<Message> messages = [];
+      debugPrint("${event.docs.length}");
       for (var document in event.docs) {
-        messages.add(Message.fromMap(document.data()));
+        if (widget.fromScreen == FromScreen.aIChatScreen) {
+          messages.add(Message.fromMapGpt(document.data()));
+        } else {
+          messages.add(Message.fromMap(document.data()));
+        }
       }
       return messages;
     });
