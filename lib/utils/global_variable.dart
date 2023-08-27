@@ -1,4 +1,5 @@
 import 'package:b_cara/screens/video_screen.dart';
+import 'package:b_cara/screens/worship_package_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:b_cara/screens/add_post_screen.dart';
@@ -11,7 +12,7 @@ const webScreenSize = 600;
 List<Widget> homeScreenItems = [
   const FeedScreen(),
   const SearchScreen(),
-  // const AddPostScreen(),
+  const WorshipPackageScreen(),
   const VideoScreen(),
   ProfileScreen(
     uid: FirebaseAuth.instance.currentUser!.uid,
@@ -20,7 +21,7 @@ List<Widget> homeScreenItems = [
 
 const String baseUrl = 'https://api.openai.com/v1';
 const String chatGPTApiKey =
-    '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';
+    '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';
 
 enum FromScreen {
   commentsScreen,
