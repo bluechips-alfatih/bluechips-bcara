@@ -26,39 +26,42 @@ class _FeedScreenState extends State<FeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
     debugPrint("${FirebaseAuth.instance.currentUser}");
     // final model.User user = Provider.of<UserProvider>(context).getUser;
     // debugPrint("Test ${user.uid}");
     return Scaffold(
       backgroundColor:
-          width > webScreenSize ? webBackgroundColor : mobileBackgroundColor,
+      width > webScreenSize ? webBackgroundColor : mobileBackgroundColor,
       appBar: width > webScreenSize
           ? null
           : AppBar(
-              backgroundColor: mobileBackgroundColor,
-              centerTitle: false,
-              // title: SvgPicture.asset(
-              //   'assets/ic_instagram.svg',
-              //   color: primaryColor,
-              //   height: 32,
-              // ),
-              actions: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.messenger_outline,
-                    color: primaryColor,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) {
-                        return const ChatListScreen();
-                      },
-                    ));
-                  },
-                ),
-              ],
+        backgroundColor: mobileBackgroundColor,
+        centerTitle: false,
+        // title: SvgPicture.asset(
+        //   'assets/ic_instagram.svg',
+        //   color: primaryColor,
+        //   height: 32,
+        // ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.messenger_outline,
+              color: primaryColor,
             ),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) {
+                  return const ChatListScreen();
+                },
+              ));
+            },
+          ),
+        ],
+      ),
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -71,7 +74,7 @@ class _FeedScreenState extends State<FeedScreen> {
               backgroundColor: mobileBackgroundColor,
               flexibleSpace: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Card(
                   color: Colors.lightBlue,
                   child: Row(
@@ -84,7 +87,7 @@ class _FeedScreenState extends State<FeedScreen> {
                           items: [
                             Card(
                               margin:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              const EdgeInsets.symmetric(horizontal: 16),
                               color: Colors.white,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -117,7 +120,7 @@ class _FeedScreenState extends State<FeedScreen> {
                             ),
                             Card(
                               margin:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              const EdgeInsets.symmetric(horizontal: 16),
                               color: Colors.white,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -137,13 +140,13 @@ class _FeedScreenState extends State<FeedScreen> {
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       children: [
                                         Flexible(
                                           child: Text(
                                             sha256
                                                 .convert(utf8.encode(
-                                                    _auth.currentUser!.email!))
+                                                _auth.currentUser!.email!))
                                                 .toString(),
                                             style: const TextStyle(
                                               color: Colors.black,
@@ -159,13 +162,13 @@ class _FeedScreenState extends State<FeedScreen> {
                                         TextButton(
                                           onPressed: () async {
                                             await Clipboard.setData(
-                                                    ClipboardData(
-                                                        text: sha256
-                                                            .convert(utf8
-                                                                .encode(_auth
-                                                                    .currentUser!
-                                                                    .email!))
-                                                            .toString()))
+                                                ClipboardData(
+                                                    text: sha256
+                                                        .convert(utf8
+                                                        .encode(_auth
+                                                        .currentUser!
+                                                        .email!))
+                                                        .toString()))
                                                 .then((value) {
                                               showSnackBar(context, "Copied");
                                             });
@@ -174,8 +177,8 @@ class _FeedScreenState extends State<FeedScreen> {
                                               padding: EdgeInsets.zero,
                                               minimumSize: const Size(50, 30),
                                               tapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
+                                              MaterialTapTargetSize
+                                                  .shrinkWrap,
                                               alignment: Alignment.center),
                                           child: const Text("Copy"),
                                         ),
@@ -189,7 +192,7 @@ class _FeedScreenState extends State<FeedScreen> {
                           options: CarouselOptions(
                             scrollDirection: Axis.vertical,
                             autoPlay: false,
-                            viewportFraction: 0.7,
+                            viewportFraction: 0.8,
                             aspectRatio: 2.0,
                             enableInfiniteScroll: false,
                           ),
@@ -261,15 +264,16 @@ class _FeedScreenState extends State<FeedScreen> {
             return ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
               itemCount: snapshot.data!.docs.length,
-              itemBuilder: (ctx, index) => Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: width > webScreenSize ? width * 0.3 : 0,
-                  vertical: width > webScreenSize ? 15 : 0,
-                ),
-                child: PostCard(
-                  snap: snapshot.data!.docs[index].data(),
-                ),
-              ),
+              itemBuilder: (ctx, index) =>
+                  Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: width > webScreenSize ? width * 0.3 : 0,
+                      vertical: width > webScreenSize ? 15 : 0,
+                    ),
+                    child: PostCard(
+                      snap: snapshot.data!.docs[index].data(),
+                    ),
+                  ),
             );
           },
         ),
