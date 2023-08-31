@@ -71,14 +71,14 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout>
         items: <Widget>[
           Icon(Icons.home, color: (_page == 0) ? primaryColor : Colors.black),
           Icon(Icons.search, color: (_page == 1) ? primaryColor : Colors.black),
-          Text("NU",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: (_page == 2) ? primaryColor : Colors.black)),
+          // Text("NU",
+          //     style: TextStyle(
+          //         fontWeight: FontWeight.bold,
+          //         color: (_page == 2) ? primaryColor : Colors.black)),
           // Icon(Icons.star, color: (_page == 2) ? primaryColor : Colors.black),
           Icon(Icons.video_camera_front_rounded,
-              color: (_page == 3) ? primaryColor : Colors.black),
-          Icon(Icons.person, color: (_page == 4) ? primaryColor : Colors.black),
+              color: (_page == 2) ? primaryColor : Colors.black),
+          Icon(Icons.person, color: (_page == 3) ? primaryColor : Colors.black),
         ],
         onTap: navigationTapped,
         index: _page,

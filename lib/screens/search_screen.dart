@@ -18,9 +18,26 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   bool isShowUsers = false;
 
   List<dynamic> uids = [];
+
+  @override
+  void initState() {
+    searchController.addListener(() {
+      if (searchController.text.isNotEmpty) {
+        setState(() {
+          isShowUsers = true;
+        });
+      } else {
+        setState(() {
+          isShowUsers = false;
+        });
+      }
+    });
+    super.initState();
+  }
 
   Future<List<Post>> _getUidsDeny(BuildContext context) async {
     try {
@@ -67,6 +84,7 @@ class _SearchScreenState extends State<SearchScreen> {
         title: Form(
           child: TextFormField(
             controller: searchController,
+            focusNode: _focusNode,
             decoration:
                 const InputDecoration(labelText: 'Search for a user...'),
             onFieldSubmitted: (String _) {
@@ -143,10 +161,13 @@ class _SearchScreenState extends State<SearchScreen> {
                     },
                     child: snapshot.data![index].type == "video"
                         ? VideoPlayerItem(
-                            videoUrl: snapshot.data![index].postUrl)
+                            videoUrl: snapshot.data![index].postUrl,
+                            height: 200,
+                          )
                         : Image.network(
                             snapshot.data![index].postUrl,
                             fit: BoxFit.cover,
+                            height: 200,
                           ),
                   ),
                   mainAxisSpacing: 8.0,
