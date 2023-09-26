@@ -1,7 +1,12 @@
 import 'dart:convert';
 
+import 'package:b_cara/extension/currency.dart';
+import 'package:b_cara/providers/user_provider.dart';
 import 'package:b_cara/screens/add_post_screen.dart';
 import 'package:b_cara/screens/chat_list_screen.dart';
+import 'package:b_cara/screens/wallet/pay_screen.dart';
+import 'package:b_cara/screens/wallet/top_up_screen.dart';
+import 'package:b_cara/screens/wallet/transfer_screen.dart';
 import 'package:b_cara/utils/utils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +17,7 @@ import 'package:b_cara/utils/colors.dart';
 import 'package:b_cara/utils/global_variable.dart';
 import 'package:b_cara/widgets/post_card.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({Key? key}) : super(key: key);
@@ -26,42 +32,55 @@ class _FeedScreenState extends State<FeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final width = MediaQuery.of(context).size.width;
     debugPrint("${FirebaseAuth.instance.currentUser}");
+    final UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    Stream<int?> coinBalanceStream() {
+      final userRef = FirebaseFirestore.instance
+          .collection('users_coin')
+          .doc(userProvider.getUser.uid);
+
+      return userRef.snapshots().map((snapshot) {
+        if (snapshot.exists) {
+          return snapshot.get('totalCoinUser') as int?;
+        } else {
+          return null;
+        }
+      });
+    }
+
     // final model.User user = Provider.of<UserProvider>(context).getUser;
     // debugPrint("Test ${user.uid}");
     return Scaffold(
       backgroundColor:
-      width > webScreenSize ? webBackgroundColor : mobileBackgroundColor,
+          width > webScreenSize ? webBackgroundColor : mobileBackgroundColor,
       appBar: width > webScreenSize
           ? null
           : AppBar(
-        backgroundColor: mobileBackgroundColor,
-        centerTitle: false,
-        // title: SvgPicture.asset(
-        //   'assets/ic_instagram.svg',
-        //   color: primaryColor,
-        //   height: 32,
-        // ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.messenger_outline,
-              color: primaryColor,
+              backgroundColor: mobileBackgroundColor,
+              centerTitle: false,
+              // title: SvgPicture.asset(
+              //   'assets/ic_instagram.svg',
+              //   color: primaryColor,
+              //   height: 32,
+              // ),
+              actions: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.messenger_outline,
+                    color: primaryColor,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return const ChatListScreen();
+                      },
+                    ));
+                  },
+                ),
+              ],
             ),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) {
-                  return const ChatListScreen();
-                },
-              ));
-            },
-          ),
-        ],
-      ),
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -74,7 +93,7 @@ class _FeedScreenState extends State<FeedScreen> {
               backgroundColor: mobileBackgroundColor,
               flexibleSpace: Padding(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Card(
                   color: Colors.lightBlue,
                   child: Row(
@@ -87,40 +106,71 @@ class _FeedScreenState extends State<FeedScreen> {
                           items: [
                             Card(
                               margin:
-                              const EdgeInsets.symmetric(horizontal: 16),
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               color: Colors.white,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    Text(
-                                      "DCC Wallet",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18.0),
-                                    ),
-                                    Text(
-                                      "0 Coins",
-                                      style: TextStyle(
-                                          color: Colors.black, fontSize: 16.0),
-                                    ),
-                                    Text(
-                                      "IDR 0",
-                                      style: TextStyle(
-                                          color: Colors.black, fontSize: 16.0),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  child: StreamBuilder<int?>(
+                                    stream:
+                                        coinBalanceStream(), // Gantilah dengan stream yang sesuai
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const Column(
+                                          children: [
+                                            Text(""),
+                                            Text(""),
+                                            Text(""),
+                                          ],
+                                        );
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final coinBalance = snapshot.data;
+                                        return Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text(
+                                              "DCC Wallet",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18.0,
+                                              ),
+                                            ),
+                                            Text(
+                                              coinBalance != null
+                                                  ? "${coinBalance.toString()} Coins"
+                                                  : "0 Coins",
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16.0,
+                                              ),
+                                            ),
+                                            Text(
+                                              coinBalance != null
+                                                  ? "${coinBalance * 15000}"
+                                                      .toIDRCurrency()
+                                                  : "IDR 0",
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16.0,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    },
+                                  )),
                             ),
                             Card(
                               margin:
-                              const EdgeInsets.symmetric(horizontal: 16),
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               color: Colors.white,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -140,13 +190,13 @@ class _FeedScreenState extends State<FeedScreen> {
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Flexible(
                                           child: Text(
                                             sha256
                                                 .convert(utf8.encode(
-                                                _auth.currentUser!.email!))
+                                                    _auth.currentUser!.email!))
                                                 .toString(),
                                             style: const TextStyle(
                                               color: Colors.black,
@@ -162,13 +212,13 @@ class _FeedScreenState extends State<FeedScreen> {
                                         TextButton(
                                           onPressed: () async {
                                             await Clipboard.setData(
-                                                ClipboardData(
-                                                    text: sha256
-                                                        .convert(utf8
-                                                        .encode(_auth
-                                                        .currentUser!
-                                                        .email!))
-                                                        .toString()))
+                                                    ClipboardData(
+                                                        text: sha256
+                                                            .convert(utf8
+                                                                .encode(_auth
+                                                                    .currentUser!
+                                                                    .email!))
+                                                            .toString()))
                                                 .then((value) {
                                               showSnackBar(context, "Copied");
                                             });
@@ -177,8 +227,8 @@ class _FeedScreenState extends State<FeedScreen> {
                                               padding: EdgeInsets.zero,
                                               minimumSize: const Size(50, 30),
                                               tapTargetSize:
-                                              MaterialTapTargetSize
-                                                  .shrinkWrap,
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
                                               alignment: Alignment.center),
                                           child: const Text("Copy"),
                                         ),
@@ -199,51 +249,101 @@ class _FeedScreenState extends State<FeedScreen> {
                           carouselController: _controller,
                         ),
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const PayScreen(),
                             ),
-                            child: const Icon(
-                              Icons.arrow_upward,
-                              color: Colors.black,
-                              size: 16,
+                          );
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.arrow_upward,
+                                color: Colors.black,
+                                size: 16,
+                              ),
                             ),
-                          ),
-                          const Text(
-                            "Pay",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
+                            const Text(
+                              "Pay",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const TopUpScreen(),
                             ),
-                            child: const Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 16,
+                          );
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 16,
+                              ),
                             ),
-                          ),
-                          const Text(
-                            "Top Up",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
+                            const Text(
+                              "Top Up",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const TransferScreen(),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 16,
+                              ),
+                            ),
+                            const Text(
+                              "Transfer",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -264,16 +364,15 @@ class _FeedScreenState extends State<FeedScreen> {
             return ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
               itemCount: snapshot.data!.docs.length,
-              itemBuilder: (ctx, index) =>
-                  Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: width > webScreenSize ? width * 0.3 : 0,
-                      vertical: width > webScreenSize ? 15 : 0,
-                    ),
-                    child: PostCard(
-                      snap: snapshot.data!.docs[index].data(),
-                    ),
-                  ),
+              itemBuilder: (ctx, index) => Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: width > webScreenSize ? width * 0.3 : 0,
+                  vertical: width > webScreenSize ? 15 : 0,
+                ),
+                child: PostCard(
+                  snap: snapshot.data!.docs[index].data(),
+                ),
+              ),
             );
           },
         ),

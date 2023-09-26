@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:b_cara/models/user_coin.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:b_cara/models/user.dart' as model;
 import 'package:b_cara/resources/storage_methods.dart';
@@ -28,6 +31,31 @@ class AuthMethods {
   }) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      // Mengecek apakah dokumen dengan UID pengguna sudah ada
+      User? cred = FirebaseAuth.instance.currentUser;
+
+      DocumentSnapshot userCoinDoc =
+          await _firestore.collection("users_coin").doc(cred!.uid).get();
+      var walletAddress = sha256.convert(utf8.encode(email)).toString();
+      var privateKey = sha256.convert(utf8.encode(cred.uid + email)).toString();
+// Jika dokumen belum ada, tambahkan data UserCoin
+      if (!userCoinDoc.exists) {
+        UserCoin userCoin = UserCoin(
+          walletAddress: walletAddress,
+          privateKey: privateKey,
+          email: email,
+          coinOnHold: 0,
+          coinSell: 0,
+          coinBuy: 0,
+          totalCoinUser: 0,
+        );
+
+        await _firestore
+            .collection("users_coin")
+            .doc(cred.uid)
+            .set(userCoin.toJson());
+      }
+
       return 'success';
     } catch (e) {
       // You can handle different exceptions and return meaningful messages here
@@ -59,7 +87,9 @@ class AuthMethods {
           photoUrl = await StorageMethods()
               .uploadImageToStorage('profilePics', file, false);
         }
-
+        var walletAddress = sha256.convert(utf8.encode(email)).toString();
+        var privateKey =
+            sha256.convert(utf8.encode(cred.user!.uid + email)).toString();
         model.User user = model.User(
           username: username,
           uid: cred.user!.uid,
@@ -75,6 +105,19 @@ class AuthMethods {
             .collection("users")
             .doc(cred.user!.uid)
             .set(user.toJson());
+
+        UserCoin userCoin = UserCoin(
+            walletAddress: walletAddress,
+            privateKey: privateKey,
+            email: email,
+            coinOnHold: 0,
+            coinSell: 0,
+            coinBuy: 0,
+            totalCoinUser: 0);
+        await _firestore
+            .collection("users_coin")
+            .doc(cred.user!.uid)
+            .set(userCoin.toJson());
 
         res = "success";
       } else {
