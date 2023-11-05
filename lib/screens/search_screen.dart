@@ -43,8 +43,8 @@ class _SearchScreenState extends State<SearchScreen> {
     try {
       final UserProvider userProvider =
           Provider.of<UserProvider>(context, listen: true);
-      uids.addAll(userProvider.getUser.following);
-      uids.add(userProvider.getUser.uid);
+      uids.addAll(userProvider.getUser!.following);
+      uids.add(userProvider.getUser!.uid);
 
       debugPrint("Uids : $uids");
       List<Post> posts = <Post>[];

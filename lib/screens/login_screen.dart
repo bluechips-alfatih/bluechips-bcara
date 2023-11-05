@@ -59,7 +59,12 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = false;
       });
       if (context.mounted) {
-        showSnackBar(context, res);
+        if (res ==
+            "[firebase_auth/user-not-found] There is no user record corresponding to this identifier. The user may have been deleted.") {
+          showSnackBar(context, "User not found, please register");
+        } else {
+          showSnackBar(context, res);
+        }
       }
     }
   }

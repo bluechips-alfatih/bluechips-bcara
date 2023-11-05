@@ -89,7 +89,7 @@ class _RowContentVideoState extends State<RowContentVideo> {
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser;
+    final User user = Provider.of<UserProvider>(context).getUser!;
     final size = MediaQuery.of(context).size;
     return Row(
       mainAxisSize: MainAxisSize.max,

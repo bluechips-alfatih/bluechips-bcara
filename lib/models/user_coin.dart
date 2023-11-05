@@ -8,7 +8,8 @@ class UserCoin {
   final int coinOnHold;
   final int coinSell;
   final int coinBuy;
-  final int totalCoinUser;
+  final double totalCoinUser;
+  final int danaUser;
   UserCoin({
     required this.walletAddress,
     required this.privateKey,
@@ -17,29 +18,10 @@ class UserCoin {
     required this.coinSell,
     required this.coinBuy,
     required this.totalCoinUser,
+    required this.danaUser,
   });
 
-  UserCoin copyWith({
-    String? walletAddress,
-    String? privateKey,
-    String? email,
-    int? coinOnHold,
-    int? coinSell,
-    int? coinBuy,
-    int? totalCoinUser,
-  }) {
-    return UserCoin(
-      walletAddress: walletAddress ?? this.walletAddress,
-      privateKey: privateKey ?? this.privateKey,
-      email: email ?? this.email,
-      coinOnHold: coinOnHold ?? this.coinOnHold,
-      coinSell: coinSell ?? this.coinSell,
-      coinBuy: coinBuy ?? this.coinBuy,
-      totalCoinUser: totalCoinUser ?? this.totalCoinUser,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'walletAddress': walletAddress,
       'privateKey': privateKey,
@@ -48,6 +30,7 @@ class UserCoin {
       'coinSell': coinSell,
       'coinBuy': coinBuy,
       'totalCoinUser': totalCoinUser,
+      'danaUser': danaUser,
     };
   }
 
@@ -59,25 +42,36 @@ class UserCoin {
       coinOnHold: map['coinOnHold'] as int,
       coinSell: map['coinSell'] as int,
       coinBuy: map['coinBuy'] as int,
-      totalCoinUser: map['totalCoinUser'] as int,
+      totalCoinUser: map['totalCoinUser'] as double,
+      danaUser: map['danaUser'] as int,
     );
   }
-  Map<String, dynamic> toJson() => {
-        'walletAddress': walletAddress,
-        'privateKey': privateKey,
-        'email': email,
-        'coinOnHold': coinOnHold,
-        'coinSell': coinSell,
-        'coinBuy': coinBuy,
-        'totalCoinUser': totalCoinUser,
-      };
+
+  // String toJson() => json.encode(toMap());
 
   factory UserCoin.fromJson(String source) =>
       UserCoin.fromMap(json.decode(source) as Map<String, dynamic>);
 
-  @override
-  String toString() {
-    return 'UserCoin(walletAddress: $walletAddress, privateKey: $privateKey, email: $email, coinOnHold: $coinOnHold, coinSell: $coinSell, coinBuy: $coinBuy, totalCoinUser: $totalCoinUser)';
+  UserCoin copyWith({
+    String? walletAddress,
+    String? privateKey,
+    String? email,
+    int? coinOnHold,
+    int? coinSell,
+    int? coinBuy,
+    double? totalCoinUser,
+    int? danaUser,
+  }) {
+    return UserCoin(
+      walletAddress: walletAddress ?? this.walletAddress,
+      privateKey: privateKey ?? this.privateKey,
+      email: email ?? this.email,
+      coinOnHold: coinOnHold ?? this.coinOnHold,
+      coinSell: coinSell ?? this.coinSell,
+      coinBuy: coinBuy ?? this.coinBuy,
+      totalCoinUser: totalCoinUser ?? this.totalCoinUser,
+      danaUser: danaUser ?? this.danaUser,
+    );
   }
 
   @override
@@ -90,7 +84,8 @@ class UserCoin {
         other.coinOnHold == coinOnHold &&
         other.coinSell == coinSell &&
         other.coinBuy == coinBuy &&
-        other.totalCoinUser == totalCoinUser;
+        other.totalCoinUser == totalCoinUser &&
+        other.danaUser == danaUser;
   }
 
   @override
@@ -101,6 +96,12 @@ class UserCoin {
         coinOnHold.hashCode ^
         coinSell.hashCode ^
         coinBuy.hashCode ^
-        totalCoinUser.hashCode;
+        totalCoinUser.hashCode ^
+        danaUser.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'UserCoin(walletAddress: $walletAddress, privateKey: $privateKey, email: $email, coinOnHold: $coinOnHold, coinSell: $coinSell, coinBuy: $coinBuy, totalCoinUser: $totalCoinUser, danaUser: $danaUser)';
   }
 }

@@ -41,15 +41,14 @@ class AuthMethods {
 // Jika dokumen belum ada, tambahkan data UserCoin
       if (!userCoinDoc.exists) {
         UserCoin userCoin = UserCoin(
-          walletAddress: walletAddress,
-          privateKey: privateKey,
-          email: email,
-          coinOnHold: 0,
-          coinSell: 0,
-          coinBuy: 0,
-          totalCoinUser: 0,
-        );
-
+            walletAddress: walletAddress,
+            privateKey: privateKey,
+            email: email,
+            coinOnHold: 0,
+            coinSell: 0,
+            coinBuy: 0,
+            totalCoinUser: 0.0,
+            danaUser: 0);
         await _firestore
             .collection("users_coin")
             .doc(cred.uid)
@@ -58,6 +57,7 @@ class AuthMethods {
 
       return 'success';
     } catch (e) {
+      print(e);
       // You can handle different exceptions and return meaningful messages here
       return e.toString();
     }
@@ -113,7 +113,8 @@ class AuthMethods {
             coinOnHold: 0,
             coinSell: 0,
             coinBuy: 0,
-            totalCoinUser: 0);
+            totalCoinUser: 0.0,
+            danaUser: 0);
         await _firestore
             .collection("users_coin")
             .doc(cred.user!.uid)

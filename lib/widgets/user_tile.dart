@@ -17,7 +17,7 @@ class UserTile extends StatelessWidget {
       title: Text(snap.username.toString()),
       trailing: TextButton(
         onPressed: () async {
-          if (userProvider.getUser.following.contains(snap.uid)) {
+          if (userProvider.getUser!.following.contains(snap.uid)) {
             Navigator.of(context).push(MaterialPageRoute(
               builder: (context) {
                 return ConversationsScreen(
@@ -29,12 +29,12 @@ class UserTile extends StatelessWidget {
             ));
           } else {
             await FireStoreMethods()
-                .followUser(userProvider.getUser.uid, snap.uid);
-            userProvider.getUser.following.add(snap.uid);
+                .followUser(userProvider.getUser!.uid, snap.uid);
+            userProvider.getUser!.following.add(snap.uid);
           }
         },
-        child: userProvider.getUser.following.contains(snap.uid) ||
-                userProvider.getUser.followers.contains(snap.uid)
+        child: userProvider.getUser!.following.contains(snap.uid) ||
+                userProvider.getUser!.followers.contains(snap.uid)
             ? const Text("Chat")
             : const Text("Follow"),
       ),

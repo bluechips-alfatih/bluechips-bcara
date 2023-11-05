@@ -44,9 +44,9 @@ class ConversationsScreen extends StatelessWidget {
           Provider.of<UserProvider>(context, listen: false);
       String callId = const Uuid().v1();
       Call senderCallData = Call(
-        callerId: userProvider.getUser.uid,
-        callerName: userProvider.getUser.username,
-        callerPic: userProvider.getUser.photoUrl,
+        callerId: userProvider.getUser!.uid,
+        callerName: userProvider.getUser!.username,
+        callerPic: userProvider.getUser!.photoUrl,
         receiverId: uid,
         receiverName: name,
         receiverPic: profilePic,
@@ -56,9 +56,9 @@ class ConversationsScreen extends StatelessWidget {
       );
 
       Call recieverCallData = Call(
-        callerId: userProvider.getUser.uid,
-        callerName: userProvider.getUser.username,
-        callerPic: userProvider.getUser.photoUrl,
+        callerId: userProvider.getUser!.uid,
+        callerName: userProvider.getUser!.username,
+        callerPic: userProvider.getUser!.photoUrl,
         receiverId: uid,
         receiverName: name,
         receiverPic: profilePic,

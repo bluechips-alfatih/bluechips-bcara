@@ -61,12 +61,12 @@ class _BottomChatFieldState extends State<BottomChatField> {
       if (widget.fromScreen == FromScreen.aIChatScreen) {
         ChatMethods().saveChatGptToCollection(
             message: _messageController.text.trim(),
-            uid: userProvider.getUser.uid,
+            uid: userProvider.getUser!.uid,
             isText: true,
             modelId: "gpt-3.5-turbo");
         ChatMethods().sendMessageToChatGPT(
             message: _messageController.text.trim(),
-            uid: userProvider.getUser.uid,
+            uid: userProvider.getUser!.uid,
             isText: true,
             modelId: "gpt-3.5-turbo");
       } else {
@@ -74,7 +74,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
             context: context,
             text: _messageController.text.trim(),
             recieverUserId: widget.recieverUserId,
-            senderUser: userProvider.getUser,
+            senderUser: userProvider.getUser!,
             isGroupChat: widget.isGroupChat);
       }
 
@@ -114,7 +114,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
       recieverUserId: widget.recieverUserId,
       messageEnum: messageEnum,
       isGroupChat: widget.isGroupChat,
-      senderUserData: userProvider.getUser,
+      senderUserData: userProvider.getUser!,
     );
   }
 

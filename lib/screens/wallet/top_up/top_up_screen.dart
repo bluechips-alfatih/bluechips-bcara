@@ -1,4 +1,7 @@
+import 'package:b_cara/extension/currency.dart';
 import 'package:b_cara/providers/user_provider.dart';
+import 'package:b_cara/screens/wallet/top_up/payment_method.dart';
+import 'package:b_cara/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +16,7 @@ class _TopUpScreenState extends State<TopUpScreen> {
   @override
   List<bool> isSelected = List.generate(6, (index) => false);
   int selectedMoneyIndex = -1;
+  int? moneyTopUp;
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider =
@@ -35,7 +39,7 @@ class _TopUpScreenState extends State<TopUpScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Row(
                 children: [
@@ -60,13 +64,14 @@ class _TopUpScreenState extends State<TopUpScreen> {
                     200000,
                     500000
                   ];
-                  final moneyText = "Rp. ${moneyValues[index]}";
+                  final moneyText = "${moneyValues[index]}".toRPCurrency();
                   final isSelectedItem = selectedMoneyIndex == index;
 
                   return InkWell(
                     onTap: () {
                       setState(() {
                         selectedMoneyIndex = index;
+                        moneyTopUp = moneyValues[index];
                       });
                     },
                     child: Card(
@@ -101,14 +106,27 @@ class _TopUpScreenState extends State<TopUpScreen> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    if (moneyTopUp == null) {
+                      showToast("Silahkan pilih nominal, terlebih dahulu");
+                    } else {
+                      print(moneyTopUp);
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return PaymentMethodScreen(
+                            nominalTopUp: moneyTopUp!,
+                          );
+                        },
+                      ));
+                    }
+
+                    // Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
                   ),
                   child: const Text(
-                    "TOP UP NOW",
+                    "Pilih Metode Pembayaran",
                     style: TextStyle(fontSize: 20, color: Colors.black),
                   ),
                 ),

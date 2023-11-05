@@ -38,7 +38,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
               child: ChatList(
                 fromScreen: FromScreen.aIChatScreen,
                 isGroupChat: false,
-                recieverUserId: userProvider.getUser.uid,
+                recieverUserId: userProvider.getUser!.uid,
               ),
             ),
             const SizedBox(

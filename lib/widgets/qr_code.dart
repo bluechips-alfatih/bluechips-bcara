@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:b_cara/screens/announc_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -144,6 +145,18 @@ class _QRCodeScannerWidgetState extends State<QRCodeScannerWidget> {
       setState(() {
         result = scanData;
       });
+
+      // Add logic to navigate to the next screen when a QR code is detected
+      if (result != null) {
+        // You can replace this with the appropriate navigation logic
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            return const AnnounceScreen(
+              statusTransaksi: "success",
+            ); // Replace 'NextScreen' with the actual next screen you want to navigate to
+          },
+        ));
+      }
     });
   }
 

@@ -53,7 +53,7 @@ class _SearchChatScreenState extends State<SearchChatScreen> {
           .where(
             'username',
             isGreaterThanOrEqualTo: queryString,
-            isNotEqualTo: userProvider.getUser.username,
+            isNotEqualTo: userProvider.getUser!.username,
           )
           .get();
     }

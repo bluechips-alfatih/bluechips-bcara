@@ -44,11 +44,11 @@ class _ChatListState extends State<ChatList> {
     String uid = recieverUserId;
     if (widget.fromScreen == FromScreen.aIChatScreen) {
       collection = "chatsGPT";
-      uid = userProvider.getUser.uid;
+      uid = userProvider.getUser!.uid;
     }
     return FirebaseFirestore.instance
         .collection('users')
-        .doc(userProvider.getUser.uid)
+        .doc(userProvider.getUser!.uid)
         .collection(collection)
         .doc(uid)
         .collection('messages')

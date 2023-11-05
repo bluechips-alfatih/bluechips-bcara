@@ -5,8 +5,9 @@ import 'package:b_cara/providers/user_provider.dart';
 import 'package:b_cara/screens/add_post_screen.dart';
 import 'package:b_cara/screens/chat_list_screen.dart';
 import 'package:b_cara/screens/wallet/pay_screen.dart';
-import 'package:b_cara/screens/wallet/top_up_screen.dart';
-import 'package:b_cara/screens/wallet/transfer_screen.dart';
+import 'package:b_cara/screens/wallet/top_up/top_up_screen.dart';
+import 'package:b_cara/screens/wallet/transfer/tab/transfer_voucher.dart';
+import 'package:b_cara/screens/wallet/transfer/transfer_screen.dart';
 import 'package:b_cara/utils/utils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,16 +35,46 @@ class _FeedScreenState extends State<FeedScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     debugPrint("${FirebaseAuth.instance.currentUser}");
-    final UserProvider userProvider =
-        Provider.of<UserProvider>(context, listen: false);
-    Stream<int?> coinBalanceStream() {
-      final userRef = FirebaseFirestore.instance
-          .collection('users_coin')
-          .doc(userProvider.getUser.uid);
+    UserProvider? userProvider;
+
+    try {
+      userProvider = Provider.of<UserProvider>(context, listen: false);
+    } catch (e) {
+      // Handle the exception, e.g., log the error or show an error message to the user
+      debugPrint('Error initializing UserProvider: $e');
+    }
+    Stream<double?> coinBalanceStream() {
+      final user = userProvider?.getUser;
+      if (user == null || user.uid.isEmpty) {
+        // Handle the case when the user or UID is null or empty
+        return Stream.value(null);
+      }
+
+      final userRef =
+          FirebaseFirestore.instance.collection('users_coin').doc(user.uid);
 
       return userRef.snapshots().map((snapshot) {
         if (snapshot.exists) {
-          return snapshot.get('totalCoinUser') as int?;
+          return snapshot.get('totalCoinUser') as double?;
+        } else {
+          return null;
+        }
+      });
+    }
+
+    Stream<int?> danaBalanceStream() {
+      final user = userProvider?.getUser;
+      if (user == null || user.uid.isEmpty) {
+        // Handle the case when the user or UID is null or empty
+        return Stream.value(null);
+      }
+
+      final userRef =
+          FirebaseFirestore.instance.collection('users_coin').doc(user.uid);
+
+      return userRef.snapshots().map((snapshot) {
+        if (snapshot.exists) {
+          return snapshot.get('danaUser') as int?;
         } else {
           return null;
         }
@@ -111,7 +142,7 @@ class _FeedScreenState extends State<FeedScreen> {
                               child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 8),
-                                  child: StreamBuilder<int?>(
+                                  child: StreamBuilder<double?>(
                                     stream:
                                         coinBalanceStream(), // Gantilah dengan stream yang sesuai
                                     builder: (context, snapshot) {
@@ -145,23 +176,32 @@ class _FeedScreenState extends State<FeedScreen> {
                                             ),
                                             Text(
                                               coinBalance != null
-                                                  ? "${coinBalance.toString()} Coins"
-                                                  : "0 Coins",
+                                                  ? "${coinBalance.toStringAsFixed(2)} Voucher"
+                                                  : "0 Voucher",
                                               style: const TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 16.0,
                                               ),
                                             ),
-                                            Text(
-                                              coinBalance != null
-                                                  ? "${coinBalance * 15000}"
-                                                      .toIDRCurrency()
-                                                  : "IDR 0",
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 16.0,
-                                              ),
-                                            ),
+                                            StreamBuilder<int?>(
+                                                stream: danaBalanceStream(),
+                                                builder: (context, snapshot) {
+                                                  final danaBalance =
+                                                      snapshot.data;
+
+                                                  print(
+                                                      "danaBalance $danaBalance");
+                                                  return Text(
+                                                    danaBalance != null
+                                                        ? "$danaBalance"
+                                                            .toIDRCurrency()
+                                                        : "IDR 0",
+                                                    style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 16.0,
+                                                    ),
+                                                  );
+                                                }),
                                           ],
                                         );
                                       }
